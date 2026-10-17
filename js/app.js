@@ -1,4 +1,4 @@
-import { DIFFICULTIES, generatePuzzle, getConflicts, getCandidates, isComplete, dailySeed } from './sudoku.js';
+import { DIFFICULTIES, generatePuzzle, getConflicts, getCandidates, getAllCandidates, isComplete, dailySeed } from './sudoku.js?v=1.0.2';
 
 const $ = id => document.getElementById(id);
 const GAME_KEY = 'sudoku-between.game.v1';
@@ -154,6 +154,7 @@ function renderBoard() {
   $('erase-button').disabled = game.paused || game.completed || selected < 0 || !!game.puzzle[selected] || !game.board[selected] && !game.notes[selected].length;
   $('hint-button').disabled = game.paused || game.completed;
   $('notes-button').disabled = game.paused || game.completed;
+  $('auto-notes-button').disabled = game.paused || game.completed || !game.board.includes(0);
 }
 function render() {
   renderBoard();
@@ -234,6 +235,20 @@ function undo() {
   game.notes = previous.notes;
   hinted = -1;
   renderBoard(); save();
+}
+function fillAllNotes() {
+  if (game.paused || game.completed || !game.board.includes(0)) return;
+  const notes = getAllCandidates(game.board);
+  const unchanged = notes.every((list, index) => list.length === game.notes[index].length && list.every((n, k) => n === game.notes[index][k]));
+  if (unchanged) { toast('所有空格的候选笔记已经是最新的'); return; }
+  snapshot();
+  game.notes = notes;
+  hinted = -1;
+  renderBoard();
+  save();
+  const blanks = game.board.filter(n => !n).length;
+  const blocked = notes.filter((list, index) => !game.board[index] && !list.length).length;
+  toast(blocked ? `已填全候选笔记；有 ${blocked} 格没有可用数字，请检查已填数字` : `已填全 ${blanks} 个空格的候选笔记，可点「撤销」恢复`);
 }
 function togglePause() {
   if (game.completed) return;
@@ -321,7 +336,7 @@ function complete() {
   openDialog('把这一刻，留给自己。', `<div class="win-mark">${icon('check')}</div><div class="win-summary"><strong>${timeLabel(game.elapsed)}</strong><p>你解开了这道${DIFFICULTIES.find(d => d.id === game.difficulty).label}数独。<br>${game.hints ? `用了 ${game.hints} 次提示，每一步都是进步。` : '独立完成，给这份专注一个小小的掌声。'}</p></div>`, [{ label: '分享同一道题', run: share }, { label: '再来一局', primary: true, run: () => startNew() }], 'A LITTLE VICTORY');
 }
 function showRules() {
-  openDialog('从一格，找到头绪。', `<p>数独的规则很简单，乐趣藏在每一次推理中。</p><ol class="rule-list"><li>在空格填入 <strong>1–9</strong>。</li><li>每一<strong>行</strong>、每一<strong>列</strong>，数字不能重复。</li><li>每一个 <strong>3 × 3 宫格</strong>，数字也各出现一次。</li></ol><p>不确定时，打开「笔记」记录候选数字。红色表示同一行、列或宫内有重复数字。每道题都有唯一解。</p><p><kbd>1</kbd> – <kbd>9</kbd> 填数 · 方向键移动<br><kbd>N</kbd> 笔记 · <kbd>Backspace</kbd> 擦除<br><kbd>Ctrl / ⌘ + Z</kbd> 撤销 · <kbd>Space</kbd> 暂停</p>`, [{ label: '开始我的思考', primary: true }], 'HOW TO PLAY');
+  openDialog('从一格，找到头绪。', `<p>数独的规则很简单，乐趣藏在每一次推理中。</p><ol class="rule-list"><li>在空格填入 <strong>1–9</strong>。</li><li>每一<strong>行</strong>、每一<strong>列</strong>，数字不能重复。</li><li>每一个 <strong>3 × 3 宫格</strong>，数字也各出现一次。</li></ol><p>点击「填全笔记」，可一次填入所有空格的候选数字；再用「笔记」手动删改。重新填全会重算已有笔记，可点「撤销」恢复。红色表示同一行、列或宫内有重复数字。每道题都有唯一解。</p><p><kbd>1</kbd> – <kbd>9</kbd> 填数 · 方向键移动<br><kbd>N</kbd> 笔记 · <kbd>Backspace</kbd> 擦除<br><kbd>Ctrl / ⌘ + Z</kbd> 撤销 · <kbd>Space</kbd> 暂停</p>`, [{ label: '开始我的思考', primary: true }], 'HOW TO PLAY');
 }
 function showSettings() {
   const rows = [ ['conflicts', '标出冲突数字', '提醒同一行、列或宫格内的重复数字'], ['highlight', '高亮关联区域', '照亮当前行、列、宫格和相同数字'], ['cleanNotes', '自动清理笔记', '填入数字时，移除关联格子的相同笔记'] ];
@@ -359,6 +374,7 @@ function bindEvents() {
   $('undo-button').addEventListener('click', undo);
   $('erase-button').addEventListener('click', erase);
   $('notes-button').addEventListener('click', () => { noteMode = !noteMode; renderNoteMode(); });
+  $('auto-notes-button').addEventListener('click', fillAllNotes);
   $('hint-button').addEventListener('click', hint);
   $('pause-button').addEventListener('click', togglePause);
   $('resume-button').addEventListener('click', () => game.completed ? startNew() : togglePause());

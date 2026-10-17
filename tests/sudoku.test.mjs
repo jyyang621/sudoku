@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  DIFFICULTIES, generatePuzzle, solve, countSolutions, getCandidates,
+  DIFFICULTIES, generatePuzzle, solve, countSolutions, getCandidates, getAllCandidates,
   getConflicts, isComplete, dailySeed,
 } from '../js/sudoku.js';
 
@@ -64,6 +64,50 @@ test('candidate digits obey row, column and box restrictions', () => {
   assert.deepEqual(getCandidates(classic, 0), []);
   assert.deepEqual(getCandidates(classic, -1), []);
   assert.deepEqual(getCandidates(Array(81).fill(0), 40), [1, 2, 3, 4, 5, 6, 7, 8, 9]);
+});
+
+test('all candidates cover every cell, respect local restrictions and preserve the board', () => {
+  const before = classic.slice();
+  const candidates = getAllCandidates(classic);
+  assert.equal(candidates.length, 81);
+  assert.deepEqual(candidates[0], []);
+  // The unique solution is 4 here, but automatic notes must retain all locally
+  // legal possibilities instead of revealing or narrowing to the answer.
+  assert.deepEqual(candidates[2], [1, 2, 4]);
+  assert.deepEqual(classic, before);
+
+  const board = Array(81).fill(0);
+  board[4] = 1; // Same row as cell 0, outside its box.
+  board[36] = 2; // Same column as cell 0, outside its box.
+  board[10] = 3; // Same box as cell 0, in another row and column.
+  assert.deepEqual(getAllCandidates(board)[0], [4, 5, 6, 7, 8, 9]);
+});
+
+test('all candidates use current user entries and leave impossible empty cells empty', () => {
+  const board = Array(81).fill(0);
+  board[0] = 5;
+  assert.deepEqual(getAllCandidates(board)[36], [1, 2, 3, 4, 6, 7, 8, 9]);
+  board[40] = 6; // A value entered by the user after the puzzle was created.
+  const before = board.slice();
+  const candidates = getAllCandidates(board);
+  assert.deepEqual(candidates[36], [1, 2, 3, 4, 7, 8, 9]);
+  assert.deepEqual(candidates[40], []);
+  assert.deepEqual(board, before);
+
+  const impossible = Array(81).fill(0);
+  for (let index = 1; index <= 8; index += 1) impossible[index] = index;
+  impossible[9] = 9;
+  assert.equal(getConflicts(impossible).size, 0);
+  assert.deepEqual(getAllCandidates(impossible)[0], []);
+});
+
+test('all candidates reject malformed boards and keep result cells independent', () => {
+  for (const board of [null, [0], Array(81).fill(10), Array(81).fill(1.5)]) {
+    assert.throws(() => getAllCandidates(board), RangeError);
+  }
+  const candidates = getAllCandidates(new Uint8Array(81));
+  candidates[0].pop();
+  assert.deepEqual(candidates[1], [1, 2, 3, 4, 5, 6, 7, 8, 9]);
 });
 
 test('all duplicate cells are reported across rows, columns and boxes', () => {

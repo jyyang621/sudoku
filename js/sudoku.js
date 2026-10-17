@@ -153,6 +153,16 @@ export function getCandidates(board, index) {
     .filter(digit => !(used & (1 << (digit - 1))));
 }
 
+/**
+ * Local candidates for every cell of the current board, without solving it.
+ * Filled cells return []; malformed boards throw RangeError. Duplicate entries
+ * still act as restrictions, so candidates can also be displayed during edits.
+ */
+export function getAllCandidates(board) {
+  if (!validBoard(board)) throw new RangeError('A Sudoku board must contain 81 integers from 0 to 9.');
+  return Array.from({ length: CELL_COUNT }, (_, index) => getCandidates(board, index));
+}
+
 /** All cells participating in a duplicate in any row, column, or box. */
 export function getConflicts(board) {
   const conflicts = new Set();
