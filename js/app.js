@@ -409,6 +409,14 @@ function bindEvents() {
 function init() {
   $('today-date').textContent = new Intl.DateTimeFormat('zh-CN', { timeZone: 'Asia/Shanghai', month: 'long', day: 'numeric', weekday: 'long' }).format(new Date());
   createBoard();
+  // Keep the keypad beside the board on desktop and directly underneath on phones.
+  const compactScreen = matchMedia('(max-width: 740px)');
+  const placeKeypad = () => {
+    if (compactScreen.matches) $('mobile-number-pad').append($('number-pad'));
+    else document.querySelector('.game-card').insertBefore($('number-pad'), document.querySelector('.card-actions'));
+  };
+  placeKeypad();
+  compactScreen.addEventListener('change', placeKeypad);
   bindEvents();
   const params = new URL(location.href).searchParams;
   const seed = params.get('p');
