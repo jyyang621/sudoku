@@ -1,0 +1,46 @@
+name: Deploy Sudoku to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test Sudoku logic
+        run: npm test
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+      - name: Prepare website files
+        run: |
+          mkdir -p _pages/js
+          cp index.html styles.css favicon.svg _pages/
+          cp js/*.js _pages/js/
+          touch _pages/.nojekyll
+      - name: Upload website
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _pages
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
