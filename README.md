@@ -3,7 +3,8 @@
 一个可以分享给朋友的中文数独网站，采用原生 HTML、CSS 和 JavaScript，适配电脑和手机，无需构建或安装依赖。
 
 - 多档难度与每日挑战。
-- 数字输入、候选笔记、撤销、擦除、检查和提示。
+- 数字输入、候选笔记、撤销、擦除、冲突检测和提示。
+- 暂停计时、键盘操作、偏好设置与本机游戏记录。
 - 自动保存本机进度，随时回来继续玩。
 - 通过链接邀请朋友挑战同一道题。
 
@@ -22,6 +23,8 @@ npm test
 ```
 
 游戏逻辑测试使用 Node.js 自带测试工具。
+
+也可以不使用 npm，直接运行 `node scripts/serve.mjs` 和 `node --test tests/sudoku.test.mjs`。
 
 ## 发布到 GitHub Pages
 
@@ -43,4 +46,4 @@ npm test
 - `scripts/serve.mjs`：无依赖本地服务器。
 - `.github/workflows/pages.yml`：GitHub Pages 自动部署。
 
-本项目参考 Sudoku Kingdom 的玩法，自行实现页面与游戏逻辑。存档保存在当前浏览器中，不会跨设备同步。
+本项目参考 [Sudoku Kingdom](https://www.sudokukingdom.com/zh/) 的玩法，自行实现页面与游戏逻辑。每道生成题都经过唯一解验证；难度按已知数字数量分级。存档保存在当前浏览器中，不会跨设备同步。
