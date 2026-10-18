@@ -6,7 +6,9 @@
   "type": "module",
   "scripts": {
     "start": "node scripts/serve.mjs",
-    "test": "node --test tests/*.test.mjs"
+    "test": "node --test tests/*.test.mjs",
+    "build:wechat": "node scripts/build-minigame.mjs",
+    "check:wechat": "node scripts/build-minigame.mjs --check"
   },
   "engines": {
     "node": ">=20"

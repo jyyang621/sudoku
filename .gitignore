@@ -7,3 +7,7 @@ Thumbs.db
 .env.*
 .vscode/
 .idea/
+wechat-minigame/project.private.config.json
+wechat-minigame/.wechatide/
+artifacts/
+preview/wechat-game.js

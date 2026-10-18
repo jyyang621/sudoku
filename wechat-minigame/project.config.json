@@ -1,0 +1,14 @@
+{
+  "description": "游戏之间 · 微信小游戏大厅",
+  "miniprogramRoot": "./",
+  "compileType": "game",
+  "appid": "wxdf7e7953e1db2558",
+  "projectname": "games-between",
+  "setting": {
+    "urlCheck": true,
+    "es6": true,
+    "minified": true
+  },
+  "simulatorType": "wechat",
+  "condition": {}
+}

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>游戏之间 · 小游戏本地预览</title>
+  <style>
+    * { box-sizing: border-box; } html, body { width: 100%; height: 100%; overflow: hidden; } body { margin: 0; background: #e9ede6; font-family: system-ui, sans-serif; color: #263c35; }
+    .phone { position: relative; width: min(100%, 430px); height: 100%; min-height: 320px; max-height: 1024px; margin: auto; background: #f8f9f5; box-shadow: 0 0 80px #36594e18; }
+    canvas { width: 100%; height: 100%; display: block; touch-action: none; }
+    .targets { position: absolute; inset: 0; pointer-events: none; }
+    .targets button { position: absolute; opacity: 0; cursor: pointer; border: 0; padding: 0; pointer-events: auto; touch-action: none; }
+    .targets button:focus-visible { opacity: .2; background: #36594e; outline: 2px solid #36594e; }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+    .status { pointer-events: none; position: absolute; top: 12px; left: 22px; right: 22px; display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; }
+    .capsule { pointer-events: none; position: absolute; top: 50px; right: 10px; width: 90px; height: 32px; border: 1px solid #263c351c; background: #ffffff80; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 16px; letter-spacing: 2px; white-space: nowrap; }
+    .badge { position: fixed; left: 24px; bottom: 24px; max-width: calc((100vw - 470px) / 2); color: #84907d; font-size: 12px; line-height: 1.8; }
+    .badge strong { color: #36594e; display: block; font-size: 16px; }
+    dialog { border: 1px solid #dfe5db; border-radius: 18px; padding: 24px; width: min(88vw, 350px); color: #263c35; background: #fff; box-shadow: 0 20px 80px #263c3526; }
+    dialog::backdrop { background: #172b2455; } dialog h2 { font-size: 18px; margin: 0 0 16px; } dialog p { white-space: pre-wrap; line-height: 1.8; font-size: 14px; }
+    dialog button { cursor: pointer; border: 0; border-radius: 8px; padding: 12px 16px; background: #edf2e6; color: #36594e; font-size: 14px; }
+    .buttons { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; } .buttons .primary { background: #36594e; color: white; }
+    .sheet button { display: block; width: 100%; margin: 6px 0; text-align: left; }
+    textarea { width: 100%; min-height: 110px; padding: 12px; border: 1px solid #dfe5db; border-radius: 8px; color: #36594e; resize: vertical; }
+    @media(max-width:850px) { .badge { display: none; } }
+  </style>
+  <script defer src="wx-preview.js"></script>
+  <script defer src="wechat-game.js"></script>
+</head>
+<body>
+  <main class="phone" aria-label="微信小游戏模拟屏幕">
+    <canvas id="game" aria-label="游戏之间，点击卡片开始游戏"></canvas>
+    <div class="targets" aria-label="游戏操作"></div>
+    <output id="game-status" class="sr-only" aria-live="polite"></output>
+    <div class="status" aria-hidden="true"><span>9:41</span><span>▮▮▮  Wi-Fi  ▰</span></div>
+    <div class="capsule" aria-hidden="true">••• │ ◉</div>
+  </main>
+  <aside class="badge"><strong>游戏之间</strong>微信小游戏 · 本地画面预览<br>使用相同的原生游戏代码。<br>上传前仍需微信工具和真机验证。</aside>
+  <dialog id="modal"><h2></h2><section></section><div class="buttons"></div></dialog>
+</body>
+</html>

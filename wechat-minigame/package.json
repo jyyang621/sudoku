@@ -1,0 +1,7 @@
+{
+  "name": "sudoku-between-wechat",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "description": "数独之间微信小游戏，无第三方运行时依赖"
+}
