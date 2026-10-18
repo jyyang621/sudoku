@@ -271,6 +271,7 @@ function createMiniGame(platform, options = {}) {
   bind('onHide', () => { syncClock(); if (screen === 'game') game.setPaused(true); background = true; save(); });
   bind('onShow', event => {
     background = false; lastTick = now();
+    if (event && event.query && event.query.g === 'home') { save(); screen = 'home'; }
     const round = sharedRound(event && event.query);
     if (round) {
       if (round.seed === game.seed && round.difficulty === game.difficulty && round.mode === game.mode) {

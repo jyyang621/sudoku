@@ -95,6 +95,24 @@ function parsedShare(app) {
   return new URLSearchParams(payload.query);
 }
 
+test('opening a shared lobby entry returns an existing game to the lobby without losing progress', () => {
+  const mock = create();
+  try {
+    mock.app.activate('openGame', 'sudoku');
+    mock.app.activate('autoNotes');
+    const before = mock.app.game.serialize();
+    mock.emit('Hide');
+    mock.advance(60000);
+    mock.emit('Show', { query: { g: 'home' } });
+    assert.equal(mock.app.screen, 'home');
+    assert.equal(mock.app.game.elapsed, before.elapsed);
+    assert.deepEqual(mock.app.game.notes, before.notes);
+    mock.app.activate('resumeGame', 'sudoku');
+    assert.equal(mock.app.game.seed, before.seed);
+    assert.deepEqual(mock.app.game.board, before.board);
+  } finally { mock.app.dispose(); }
+});
+
 test('mini-game opens on its home screen and only puzzle shares include a seed', () => {
   const mock = create();
   try {
